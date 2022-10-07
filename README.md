@@ -1,2 +1,2 @@
 # SocialNetwork
-.NET App with MongoDB
+.NET Console App with MongoDB
