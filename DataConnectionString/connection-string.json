@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "socialNetwork": "mongodb+srv://Iryna:ppKHbAeZ3QDH4Vm@cluster0.hq84fpw.mongodb.net/socialNetwork?authSource=admin"
+  }
+}
