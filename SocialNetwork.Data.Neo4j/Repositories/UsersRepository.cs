@@ -111,6 +111,22 @@ namespace SocialNetwork.Data.Neo4j.Repositories
             return areFriends;
         }
 
+        public bool IfFollows(int userId, int searchedUserId)
+        {
+            var areFriends = client.Cypher
+                .Match("(u:User {id: $uid})-[r:Follows]->(s: User {id: $sid})")
+                .WithParam("uid", userId)
+                .WithParam("sid", searchedUserId)
+                .Return((u, s) => new
+                {
+                    Follow = s.As<User>()
+                })
+                .ResultsAsync.Result
+                .Count() == 1;
+
+            return areFriends;
+        }
+
         public long? ShortestPathToSearthedUser(int userId, int searchedUserId)
         {
             var shortestPath = client.Cypher

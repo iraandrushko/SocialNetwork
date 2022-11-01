@@ -19,7 +19,7 @@ namespace SocialNetwork.ConsoleApp
             this.dbContext = dbContext;
             this.dbNeo4jContext = dbNeo4jContext;
 
-            //appContext.SignIn("kmeus4@upenn.edu", "aUTdmmmbH");
+            appContext.SignIn("kmeus4@upenn.edu", "aUTdmmmbH");
 
         }
         public void ShowMenu() 
@@ -52,8 +52,9 @@ namespace SocialNetwork.ConsoleApp
                 Console.WriteLine("10. Like/Dislike Post");
                 Console.WriteLine("11. Show Friends");
                 Console.WriteLine("12. UnSubscribe");
-                Console.WriteLine("13. Check if Friend");
-                Console.WriteLine("14. Get path length");
+                Console.WriteLine("13. Check If Friend");
+                Console.WriteLine("14. Get Shortest Path Length");
+                Console.WriteLine("15. Check If Follows");
                 Console.WriteLine("0. Sign Out");
                 Console.Write(">> ");
                 input = int.Parse(Console.ReadLine());
@@ -102,6 +103,9 @@ namespace SocialNetwork.ConsoleApp
                     case 14:
                         ShowPathLength();
                         break;
+                    case 15:
+                        ShowIfFollows();
+                        break;
                     case 0:
                         SignOut();
                         break;
@@ -109,12 +113,20 @@ namespace SocialNetwork.ConsoleApp
             } while (input != 0);
         }
 
+        private void ShowIfFollows()
+        {
+            Console.WriteLine("User Id: ");
+            var userId = int.Parse(Console.ReadLine());
+            var ifFollows = dbNeo4jContext.Users.IfFollows(appContext.CurrentUser.Id, userId);
+            Console.WriteLine("Follows: {0}", ifFollows);
+        }
+
         private void ShowIfFriends()
         {
             Console.WriteLine("User Id: ");
             var userId = int.Parse(Console.ReadLine());
             var areFriends = dbNeo4jContext.Users.AreFriends(appContext.CurrentUser.Id, userId);
-            Console.WriteLine("Are friends: {0}", areFriends);
+            Console.WriteLine("Are Friends: {0}", areFriends);
         }
 
         private void ShowPathLength()
@@ -122,7 +134,15 @@ namespace SocialNetwork.ConsoleApp
             Console.WriteLine("User Id: ");
             var userId = int.Parse(Console.ReadLine());
             var sp = dbNeo4jContext.Users.ShortestPathToSearthedUser(appContext.CurrentUser.Id, userId);
-            Console.WriteLine("Shortest path: {0}", sp);
+            if(sp == 0)
+            {
+                Console.WriteLine("There Is No Path To This User");
+            }
+            else
+            {
+                Console.WriteLine("Shortest Path: {0}", sp);
+            }
+            
         }
 
         private void DeleteUser()
@@ -132,6 +152,7 @@ namespace SocialNetwork.ConsoleApp
 
             dbContext.Users.Delete(appContext.CurrentUser.Id);
             dbNeo4jContext.Users.DeleteUser(appContext.CurrentUser.Id);
+            Console.WriteLine($"User {appContext.CurrentUser.Email} Deleted");
             SignOut();
         }
         private void CreateUser()
@@ -197,6 +218,7 @@ namespace SocialNetwork.ConsoleApp
                 Password = password
             };
             dbNeo4jContext.Users.CreateUser(userNeo4j);
+            Console.WriteLine($"User {userMongo.Email} Created");
         }
         private void SubscribeToAUser()
         {
@@ -204,6 +226,7 @@ namespace SocialNetwork.ConsoleApp
             var userId = int.Parse(Console.ReadLine());
             dbContext.Users.Subscribe(appContext.CurrentUser.Id, userId);
             dbNeo4jContext.Users.CreateRelationshipUserFollows(appContext.CurrentUser.Id, userId);
+            Console.WriteLine("Cogratulation!! Valid Subscription");
 
         }
         private void UnSubscribe()
@@ -212,6 +235,7 @@ namespace SocialNetwork.ConsoleApp
             var userId = int.Parse(Console.ReadLine());
             dbContext.Users.UnSubscribe(appContext.CurrentUser.Id, userId);
             dbNeo4jContext.Users.DeleteRelationshipUserFollower(appContext.CurrentUser.Id, userId);
+            Console.WriteLine("Cogratulation!! Valid UnSubscription");
         }
         private void LikeOrDislikePost()
         {
