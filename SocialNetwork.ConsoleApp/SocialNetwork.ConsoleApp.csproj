@@ -47,6 +47,9 @@
     <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Configuration.Abstractions.6.0.0\lib\net461\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Binder, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.Binder.6.0.0\lib\net461\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Configuration.FileExtensions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Configuration.FileExtensions.6.0.0\lib\net461\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
     </Reference>
@@ -156,7 +159,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppContext.cs" />
-    <Compile Include="Configuration.cs" />
+    <Compile Include="Config\Configuration.cs" />
+    <Compile Include="Config\Neo4JCredentials.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -169,6 +173,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SocialNetwork.Data.Neo4j\SocialNetwork.Data.Neo4j.csproj">
+      <Project>{e6275aff-4b81-461c-ad54-4a0ea75c3bcd}</Project>
+      <Name>SocialNetwork.Data.Neo4j</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SocialNetwork.Data\SocialNetwork.Data.csproj">
       <Project>{5b173a29-c00a-43aa-9069-7b5a09b6e0b1}</Project>
       <Name>SocialNetwork.Data</Name>

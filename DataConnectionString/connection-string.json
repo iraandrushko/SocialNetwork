@@ -1,5 +1,10 @@
 {
   "ConnectionStrings": {
     "socialNetwork": "mongodb+srv://Iryna:ppKHbAeZ3QDH4Vm@cluster0.hq84fpw.mongodb.net/socialNetwork?authSource=admin"
+  },
+  "neo4j": {
+    "uri": "neo4j+s://6dbed572.databases.neo4j.io:7687",
+    "userName": "neo4j",
+    "password": "x99trBx9nSJXT05-YAqUxy_mqagIz1MsKHppqnBwiHU"
   }
 }

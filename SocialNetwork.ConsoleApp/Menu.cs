@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using SocialNetwork.Data;
 using SocialNetwork.Data.Models;
-using SocialNetwork.Data;
+using SocialNetwork.Data.Neo4j;
+using SocialNetwork.Data.Neo4j.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SocialNetwork.ConsoleApp
 {
@@ -14,13 +11,15 @@ namespace SocialNetwork.ConsoleApp
     {
         private readonly AppContext appContext;
         private readonly DatabaseContext dbContext;
+        private readonly DatabaseContextNeo4j dbNeo4jContext;
 
-        public Menu(AppContext appContext, DatabaseContext dbContext)
+        public Menu(AppContext appContext, DatabaseContext dbContext, DatabaseContextNeo4j dbNeo4jContext)
         {
             this.appContext = appContext;
             this.dbContext = dbContext;
+            this.dbNeo4jContext = dbNeo4jContext;
 
-            appContext.SignIn("kmeus4@upenn.edu", "aUTdmmmbH");
+            //appContext.SignIn("kmeus4@upenn.edu", "aUTdmmmbH");
 
         }
         public void ShowMenu() 
@@ -34,6 +33,7 @@ namespace SocialNetwork.ConsoleApp
                 ShowAnonymousUserMenu();
             }
         }
+
         private void ShowAuthentaciatedUserMenu() 
         {;
             int input = -1;
@@ -44,13 +44,16 @@ namespace SocialNetwork.ConsoleApp
                 Console.WriteLine("2. Show Latest Posts");
                 Console.WriteLine("3. Create Post");
                 Console.WriteLine("4. Create Comment");
-                Console.WriteLine("5. Show Users");
-                Console.WriteLine("6. Subscribe to a User");
-                Console.WriteLine("7. Show Follows");
-                Console.WriteLine("8. Show Stream");
-                Console.WriteLine("9. Like/Dislike Post");
-                Console.WriteLine("10. Show Friends");
-                Console.WriteLine("11. UnSubscribe");
+                Console.WriteLine("5. Delete Account");
+                Console.WriteLine("6. Show Users");
+                Console.WriteLine("7. Subscribe to a User");
+                Console.WriteLine("8. Show Follows");
+                Console.WriteLine("9. Show Stream");
+                Console.WriteLine("10. Like/Dislike Post");
+                Console.WriteLine("11. Show Friends");
+                Console.WriteLine("12. UnSubscribe");
+                Console.WriteLine("13. Check if Friend");
+                Console.WriteLine("14. Get path length");
                 Console.WriteLine("0. Sign Out");
                 Console.Write(">> ");
                 input = int.Parse(Console.ReadLine());
@@ -70,25 +73,34 @@ namespace SocialNetwork.ConsoleApp
                         CreateComment();
                         break;
                     case 5:
-                        ShowUsers();
+                        DeleteUser();
                         break;
                     case 6:
-                        SubscribeToAUser();
+                        ShowUsers();
                         break;
                     case 7:
-                        ShowFollowers();
+                        SubscribeToAUser();
                         break;
                     case 8:
-                        ShowPosts();
+                        ShowFollows();
                         break;
                     case 9:
-                        LikeOrDislikePost();
+                        ShowPosts();
                         break;
                     case 10:
-                        ShowFriends();
+                        LikeOrDislikePost();
                         break;
                     case 11:
+                        ShowFriends();
+                        break;
+                    case 12:
                         UnSubscribe();
+                        break;
+                    case 13:
+                        ShowIfFriends();
+                        break;
+                    case 14:
+                        ShowPathLength();
                         break;
                     case 0:
                         SignOut();
@@ -96,18 +108,110 @@ namespace SocialNetwork.ConsoleApp
                 }
             } while (input != 0);
         }
+
+        private void ShowIfFriends()
+        {
+            Console.WriteLine("User Id: ");
+            var userId = int.Parse(Console.ReadLine());
+            var areFriends = dbNeo4jContext.Users.AreFriends(appContext.CurrentUser.Id, userId);
+            Console.WriteLine("Are friends: {0}", areFriends);
+        }
+
+        private void ShowPathLength()
+        {
+            Console.WriteLine("User Id: ");
+            var userId = int.Parse(Console.ReadLine());
+            var sp = dbNeo4jContext.Users.ShortestPathToSearthedUser(appContext.CurrentUser.Id, userId);
+            Console.WriteLine("Shortest path: {0}", sp);
+        }
+
+        private void DeleteUser()
+        {
+            //Console.Write("Enter userId: ");
+            //int userId = int.Parse(Console.ReadLine());
+
+            dbContext.Users.Delete(appContext.CurrentUser.Id);
+            dbNeo4jContext.Users.DeleteUser(appContext.CurrentUser.Id);
+            SignOut();
+        }
+        private void CreateUser()
+        {
+            var userMongo = new Data.Models.User();
+            var userNeo4j = new Data.Neo4j.Models.User();
+            int input = -1;
+            Console.Write("FirstName: ");
+            var firstName = Console.ReadLine();
+            Console.Write("LastName: ");
+            var lastName = Console.ReadLine();
+            Console.Write("Email: ");
+            var email = Console.ReadLine();
+            Console.Write("Gender: ");
+            var gender = Console.ReadLine();
+            Console.Write("Age: ");
+            var age = int.Parse(Console.ReadLine());
+            Console.Write("Password: ");
+            var password = Console.ReadLine();
+            Console.WriteLine("Interests: ");
+            List<string> interests = new List<string>();
+            do
+            {
+                Console.WriteLine("1.Add interest");
+                Console.WriteLine("0.Exit");
+                Console.Write(">> ");
+                input = int.Parse(Console.ReadLine());
+                switch (input)
+                {
+                    case 1:
+                        Console.Write("Interest: ");
+                        var interest = Console.ReadLine();
+                        interests.Add(interest);
+                        break;
+                    case 0:
+                        break;
+                }
+            } while (input != 0);
+            List<int> follows = new List<int>();
+            List<int> friends = new List<int>();
+            userMongo = new Data.Models.User
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                Gender = gender,
+                Age = age,
+                Password = password,
+                Interests = interests,
+                Follows = follows,
+                Friends = friends
+            };
+            dbContext.Users.Add(userMongo);
+
+            userNeo4j = new Data.Neo4j.Models.User
+            {
+                Id = userMongo.Id,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                Gender = gender,
+                Age = age,
+                Password = password
+            };
+            dbNeo4jContext.Users.CreateUser(userNeo4j);
+        }
         private void SubscribeToAUser()
         {
             Console.WriteLine("User Id: ");
             var userId = int.Parse(Console.ReadLine());
             dbContext.Users.Subscribe(appContext.CurrentUser.Id, userId);
-        }
+            dbNeo4jContext.Users.CreateRelationshipUserFollows(appContext.CurrentUser.Id, userId);
 
+        }
         private void UnSubscribe()
         {
             Console.WriteLine("User Id: ");
             var userId = int.Parse(Console.ReadLine());
             dbContext.Users.UnSubscribe(appContext.CurrentUser.Id, userId);
+            dbNeo4jContext.Users.DeleteRelationshipUserFollower(appContext.CurrentUser.Id, userId);
         }
         private void LikeOrDislikePost()
         {
@@ -177,7 +281,7 @@ namespace SocialNetwork.ConsoleApp
                 Console.WriteLine(user.FirstName + " " + user.LastName);
             }
         }
-        private void ShowFollowers()
+        private void ShowFollows()
         {
             var authenticatedUserFollowers = dbContext.Users.GetUserFollows(appContext.CurrentUser.Id);
             foreach (var follower in authenticatedUserFollowers)
@@ -200,6 +304,7 @@ namespace SocialNetwork.ConsoleApp
             do
             {
                 Console.WriteLine("1. Sign In");
+                Console.WriteLine("2. Create Account");
                 Console.WriteLine("0. Exit");
 
                 Console.Write(">> ");
@@ -209,6 +314,9 @@ namespace SocialNetwork.ConsoleApp
                 {
                     case 1:
                         SignIn();
+                        break;
+                    case 2:
+                        CreateUser();
                         break;
                 }
 

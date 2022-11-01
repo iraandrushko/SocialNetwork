@@ -22,7 +22,15 @@ namespace SocialNetwork.Data.Repositories
 
         public void Add(User newUser)
         {
+            var user = users.Find(Builders<User>.Filter.Empty).SortByDescending(u => u.Id).Limit(1).FirstOrDefault();
+            var newId = user.Id + 1;
+            newUser.Id = newId;
             users.InsertOne(newUser);
+        }
+
+        public void Delete(int userId)
+        {
+            users.DeleteOne(p => p.Id == userId);
         }
 
         public List<User> GetAll()
@@ -66,17 +74,15 @@ namespace SocialNetwork.Data.Repositories
             var potentialFriend = users.Find(Builders<User>.Filter.Eq(u => u.Id, potentialFriendId)).FirstOrDefault();
             if (!user.Follows.Contains(potentialFriendId))
             {
-                user.Follows.Add(potentialFriendId);
                 users.UpdateOne(Builders<User>.Filter.Eq(u => u.Id, userId), Builders<User>.Update.Push(u => u.Follows, potentialFriendId));
             }
 
-            if(potentialFriend.Follows.Contains(userId))
+            if(!user.Friends.Contains(potentialFriendId) && potentialFriend.Follows.Contains(userId))
             {
-                potentialFriend.Friends.Add(potentialFriendId);
                 users.UpdateOne(Builders<User>.Filter.Eq(u => u.Id, potentialFriendId), Builders<User>.Update.Push(u => u.Friends, userId));
-                user.Friends.Add(userId);
                 users.UpdateOne(Builders<User>.Filter.Eq(u => u.Id, userId), Builders<User>.Update.Push(u => u.Friends, potentialFriendId));
             }
+          
         }
 
         public void UnSubscribe(int userId, int anotherUId)
@@ -85,15 +91,12 @@ namespace SocialNetwork.Data.Repositories
             var anotherUser = users.Find(Builders<User>.Filter.Eq(u => u.Id, anotherUId)).FirstOrDefault();
             if (user.Follows.Contains(anotherUId))
             {
-                user.Follows.Remove(anotherUId);
                 users.UpdateOne(Builders<User>.Filter.Eq(u => u.Id, userId), Builders<User>.Update.Pull(u => u.Follows, anotherUId));
             }
 
             if (user.Friends.Contains(anotherUId))
             {
-                user.Friends.Remove(anotherUId);
                 users.UpdateOne(Builders<User>.Filter.Eq(u => u.Id, userId), Builders<User>.Update.Pull(u => u.Friends, anotherUId));
-                anotherUser.Friends.Remove(userId);
                 users.UpdateOne(Builders<User>.Filter.Eq(u => u.Id, anotherUId), Builders<User>.Update.Pull(u => u.Friends, userId));
             }
         }

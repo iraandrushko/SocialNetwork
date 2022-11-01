@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialNetwork.ConsoleApp", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialNetwork.Data", "SocialNetwork.Data\SocialNetwork.Data.csproj", "{5B173A29-C00A-43AA-9069-7B5A09B6E0B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialNetwork.Data.Neo4j", "SocialNetwork.Data.Neo4j\SocialNetwork.Data.Neo4j.csproj", "{E6275AFF-4B81-461C-AD54-4A0EA75C3BCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{5B173A29-C00A-43AA-9069-7B5A09B6E0B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B173A29-C00A-43AA-9069-7B5A09B6E0B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B173A29-C00A-43AA-9069-7B5A09B6E0B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6275AFF-4B81-461C-AD54-4A0EA75C3BCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6275AFF-4B81-461C-AD54-4A0EA75C3BCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6275AFF-4B81-461C-AD54-4A0EA75C3BCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6275AFF-4B81-461C-AD54-4A0EA75C3BCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{43FD6B86-1029-460B-80C0-532DAFB43174} = {7C6270BC-F324-4EFB-9D4B-CDFFB944B005}
 		{5B173A29-C00A-43AA-9069-7B5A09B6E0B1} = {14B4B10B-76EB-4E8B-B0A4-480C4814717C}
+		{E6275AFF-4B81-461C-AD54-4A0EA75C3BCD} = {14B4B10B-76EB-4E8B-B0A4-480C4814717C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5FA82D4B-0EE1-4FA2-B268-50F75E3E6EA8}
